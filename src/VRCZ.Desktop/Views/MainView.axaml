@@ -1,0 +1,132 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:c="http://schemas.superdev.ch/valueconverters/2016/xaml"
+             xmlns:u="https://irihi.tech/ursa"
+             xmlns:converters="clr-namespace:VRCZ.Desktop.Converters"
+             xmlns:mainView="clr-namespace:VRCZ.Desktop.ViewModels.Views.MainView"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="mainView:MainViewModel"
+             x:Class="VRCZ.Desktop.Views.MainView">
+
+    <UserControl.Resources>
+        <c:InverseBoolConverter x:Key="InverseBoolConverter" />
+        <converters:KeyToResourceConverter x:Key="KeyToResourceConverter" />
+    </UserControl.Resources>
+
+    <Grid RowDefinitions="Auto,*">
+        <Border
+            Height="60"
+            Margin="0"
+            Padding="12,0"
+            CornerRadius="0"
+            Background="Transparent"
+            Theme="{DynamicResource CardBorder}">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Grid.Styles>
+                    <Style Selector="RadioButton:checked">
+                        <Setter Property="Foreground" Value="{DynamicResource SemiColorPrimary}" />
+                    </Style>
+                    <Style Selector="RadioButton">
+                        <Setter Property="FontWeight" Value="Bold" />
+                        <Setter Property="Foreground" Value="{DynamicResource SemiColorTertiary}" />
+                    </Style>
+                </Grid.Styles>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <ItemsControl ItemsSource="{Binding NavMenu.TopItems}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="mainView:TopNavMenuItemViewModel">
+                                <RadioButton Theme="{DynamicResource PureCardRadioButton}" GroupName="TopNavMenu"
+                                             IsChecked="{Binding IsDefault, Mode=OneTime}"
+                                             Command="{Binding NavigateCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <u:TwoTonePathIcon Width="{DynamicResource SemiWidthIconLarge}"
+                                                           Data="{Binding Icon, Converter={StaticResource KeyToResourceConverter}}"
+                                                           Margin="0,0,10,0"
+                                                           VerticalAlignment="Center"
+                                                           ActiveForeground="{DynamicResource SemiColorPrimary}"
+                                                           ActiveStrokeBrush="{DynamicResource SemiColorPrimary}"
+                                                           Foreground="{DynamicResource SemiColorTertiary}"
+                                                           StrokeBrush="{DynamicResource SemiColorTertiary}"
+                                                           IsActive="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=RadioButton}, Path=IsChecked, Mode=OneWay}" />
+                                        <TextBlock VerticalAlignment="Center" Text="{Binding Header}" />
+                                    </StackPanel>
+                                </RadioButton>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <u:Avatar Classes="Small" />
+                </StackPanel>
+            </Grid>
+        </Border>
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto">
+            <Border
+                Padding="8"
+                Margin="0"
+                CornerRadius="0"
+                Theme="{DynamicResource CardBorder}"
+                IsVisible="{Binding CurrentPage.FullPage, Converter={StaticResource InverseBoolConverter}, FallbackValue=true}">
+                <u:NavMenu CanToggle="true" ExpandWidth="250" Padding="0 2"
+                           CommandBinding="{Binding NavigateCommand, DataType=mainView:NavMenuItemViewModel}"
+                           IconBinding="{Binding Icon, DataType=mainView:NavMenuItemViewModel}"
+                           ItemsSource="{Binding NavMenu.Items}">
+                    <u:NavMenu.Styles>
+                        <Style Selector="u|NavMenuItem > Grid > Border">
+                            <Setter Property="Height" Value="40" />
+                        </Style>
+                        <Style Selector="u|NavMenuItem:selected > TextBlock">
+                            <Setter Property="Foreground" Value="{DynamicResource SemiColorPrimary}" />
+                        </Style>
+                        <Style Selector="u|NavMenuItem > TextBlock">
+                            <Setter Property="FontWeight" Value="Bold" />
+                        </Style>
+                        <Style Selector="ContentPresenter#PART_HeaderPresenter">
+                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                        </Style>
+                        <Style x:DataType="mainView:NavMenuItemViewModel" Selector="u|NavMenuItem">
+                            <Setter Property="IsSeparator" Value="{Binding IsSeparator}" />
+                            <Setter Property="IsSelected" Value="{Binding IsDefault, Mode=OneTime}"/>
+                            <Setter Property="IsHighlighted" Value="{Binding IsDefault, Mode=OneTime}"/>
+                        </Style>
+                    </u:NavMenu.Styles>
+                    <u:NavMenu.IconTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <u:TwoTonePathIcon Width="{DynamicResource SemiWidthIconLarge}"
+                                               Data="{Binding Converter={StaticResource KeyToResourceConverter}}"
+                                               Margin="5,0"
+                                               ActiveForeground="{DynamicResource SemiColorPrimary}"
+                                               ActiveStrokeBrush="{DynamicResource SemiColorPrimary}"
+                                               Foreground="{DynamicResource SemiColorTertiary}"
+                                               StrokeBrush="{DynamicResource SemiColorTertiary}"
+                                               IsActive="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=u:NavMenuItem}, Path=IsHighlighted, Mode=OneWay}" />
+                        </DataTemplate>
+                    </u:NavMenu.IconTemplate>
+                    <u:NavMenu.HeaderTemplate>
+                        <DataTemplate DataType="mainView:NavMenuItemViewModel">
+                            <TextBlock Text="{Binding Header}" />
+                        </DataTemplate>
+                    </u:NavMenu.HeaderTemplate>
+                </u:NavMenu>
+            </Border>
+            <TransitioningContentControl Content="{Binding CurrentPage}" Grid.Column="1" />
+            <Border Grid.Column="2"
+                    Padding="8 4"
+                    Margin="0"
+                    CornerRadius="0"
+                    Theme="{DynamicResource CardBorder}"
+                    IsVisible="{Binding CurrentPage.FullPage, Converter={StaticResource InverseBoolConverter}, FallbackValue=true}">
+                <StackPanel>
+                    <Button Content="Navigate" Command="{Binding GoHomeCommand}" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>
