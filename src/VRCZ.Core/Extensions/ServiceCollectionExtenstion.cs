@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Net.Http.Headers;
+using Microsoft.Extensions.DependencyInjection;
 using VRCZ.Core.Services;
 
 namespace VRCZ.Core.Extensions;
@@ -14,7 +15,10 @@ public static class ServiceCollectionExtenstion
 
         services.AddTransient(serviceProvider =>
             serviceProvider.GetRequiredService<VRChatApiClientFactory>().GetClient());
-        services.AddHttpClient<VRChatApiClientFactory>()
+        services.AddHttpClient<VRChatApiClientFactory>(client =>
+            {
+                client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("VRCZ.Core", "snapshot"));
+            })
             .ConfigurePrimaryHttpMessageHandler(servicesProvider => new SocketsHttpHandler
             {
                 CookieContainer = servicesProvider.GetRequiredService<UserProfileService>().CookieContainer,
