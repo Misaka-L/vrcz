@@ -85,17 +85,48 @@ public class VRChatAuthService(UserProfileService userProfileService, VRChatApiC
 #pragma warning restore CS0618
             throw new UnexpectedApiBehaviourException("User Username is null");
 
-        if (userResponse.CurrentUser.CurrentAvatarImageUrl is null)
-            throw new UnexpectedApiBehaviourException("User CurrentAvatarImageUrl is null");
-
         var profileId = userResponse.CurrentUser.Id;
+        var avatarUrl = GetAvatarUrl(userResponse.CurrentUser.UserIcon, userResponse.CurrentUser.CurrentAvatarImageUrl);
 
 #pragma warning disable CS0618
         await userProfileService.CreateProfileAsync(profileId, userResponse.CurrentUser.Username,
             userResponse.CurrentUser.DisplayName,
-            userResponse.CurrentUser.CurrentAvatarImageUrl);
+            avatarUrl);
 #pragma warning restore CS0618
 
         await userProfileService.LoadProfileAsync(profileId);
+    }
+
+    public async Task UpdateProfileForCurrentAccountAsync()
+    {
+        if (userProfileService.CurrentProfile is null)
+            throw new InvalidOperationException("Profile is not loaded");
+
+        var userResponse = await vrchatApiClient.Auth.User.GetAsUserGetResponseAsync();
+
+        if (userResponse?.CurrentUser?.Id is not { } userId)
+            throw new InvalidOperationException("Not logged in");
+
+        if (userProfileService.CurrentProfile.Id != userId)
+            throw new InvalidOperationException("Api response user id is not same with loaded profile id");
+
+        if (userResponse.CurrentUser.DisplayName is null)
+            throw new UnexpectedApiBehaviourException("User DisplayName is null");
+
+        var avatarUrl = GetAvatarUrl(userResponse.CurrentUser.UserIcon, userResponse.CurrentUser.CurrentAvatarImageUrl);
+
+        userProfileService.CurrentProfile.DisplayName = userResponse.CurrentUser.DisplayName;
+        userProfileService.CurrentProfile.AvatarUrl = avatarUrl;
+
+        await userProfileService.SaveProfileAsync();
+    }
+
+    private string GetAvatarUrl(string? userIcon, string? currentAvatarImageUrl)
+    {
+        return !string.IsNullOrWhiteSpace(userIcon)
+            ? userIcon
+            : !string.IsNullOrWhiteSpace(currentAvatarImageUrl)
+                ? currentAvatarImageUrl
+                : throw new UnexpectedApiBehaviourException("User CurrentAvatarImageUrl and UserIcon is null at same time");
     }
 }

@@ -15,6 +15,7 @@ namespace VRCZ.Desktop.ViewModels.Views;
 public partial class ProfileSelectionViewModel(
     UserProfileService userProfileService,
     RemoteImageLoadService remoteImageLoadService,
+    VRChatAuthService vrchatAuthService,
     IServiceProvider serviceProvider) : ViewModelBase
 {
     [ObservableProperty] private UserProfileItemViewModel[] _profiles = [];
@@ -25,7 +26,8 @@ public partial class ProfileSelectionViewModel(
         var profiles = await userProfileService.GetProfilesAsync();
 
         Profiles = profiles
-            .Select(profile => new UserProfileItemViewModel(profile, remoteImageLoadService, userProfileService))
+            .Select(profile =>
+                new UserProfileItemViewModel(profile, remoteImageLoadService, userProfileService, vrchatAuthService))
             .ToArray();
     }
 

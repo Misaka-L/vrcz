@@ -10,7 +10,8 @@ namespace VRCZ.Desktop.ViewModels;
 public partial class UserProfileItemViewModel(
     UserProfile userProfile,
     RemoteImageLoadService remoteImageLoadService,
-    UserProfileService userProfileService) : ViewModelBase
+    UserProfileService userProfileService,
+    VRChatAuthService vrchatAuthService) : ViewModelBase
 {
     public UserProfile UserProfile => userProfile;
     public Task<Bitmap?> ProfileImage => remoteImageLoadService.LoadImageAsync(UserProfile.AvatarUrl);
@@ -19,5 +20,6 @@ public partial class UserProfileItemViewModel(
     private async Task LoadProfile()
     {
         await userProfileService.LoadProfileAsync(UserProfile.Id);
+        await vrchatAuthService.UpdateProfileForCurrentAccountAsync();
     }
 }
