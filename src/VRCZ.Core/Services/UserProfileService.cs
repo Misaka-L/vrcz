@@ -94,7 +94,21 @@ public class UserProfileService
         return (metaData, secret);
     }
 
-    public async Task CreateProfileAsync(string profileId, string username, string displayName, string avatarUrl)
+    public async Task UnloadProfileAsync()
+    {
+        if (IsProfileLoaded)
+        {
+            throw new InvalidOperationException("No profile loaded");
+        }
+
+        await SaveProfileAsync();
+
+        CurrentProfile = null;
+        CurrentProfileSecret = null;
+        ProfileChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    public async Task CreateProfileAsync(string profileId, string username, string displayName, string avatarUrl, string password)
     {
         var profileStoragePath = ProfileStorageUtils.GetUserProfileStoragePath(profileId);
         var profileMetaDataPath = Path.Combine(profileStoragePath, ProfileStorageUtils.UserProfileMetaDataFileName);
@@ -117,7 +131,9 @@ public class UserProfileService
 
         var secret = new UserProfileSecret
         {
-            Cookies = CookieContainer.GetAllCookies().ToList()
+            Cookies = CookieContainer.GetAllCookies().ToList(),
+            Username = username,
+            Password = password
         };
 
         await File.WriteAllTextAsync(profileMetaDataPath,

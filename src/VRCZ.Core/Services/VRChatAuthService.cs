@@ -4,7 +4,9 @@ using System.Text.RegularExpressions;
 using Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options;
 using VRCZ.Core.Exceptions;
 using VRCZ.Core.Models;
+using VRCZ.Core.Models.VRChat;
 using VRCZ.VRChatApi.Generated;
+using VRCZ.VRChatApi.Generated.Auth.User;
 using VRCZ.VRChatApi.Generated.Models;
 
 namespace VRCZ.Core.Services;
@@ -69,7 +71,7 @@ public class VRChatAuthService(UserProfileService userProfileService, VRChatApiC
         return verified;
     }
 
-    public async Task CreateProfileForCurrentAccountAsync()
+    public async Task CreateProfileForCurrentAccountAsync(string password)
     {
         var userResponse = await vrchatApiClient.Auth.User.GetAsUserGetResponseAsync();
 
@@ -91,7 +93,7 @@ public class VRChatAuthService(UserProfileService userProfileService, VRChatApiC
 #pragma warning disable CS0618
         await userProfileService.CreateProfileAsync(profileId, userResponse.CurrentUser.Username,
             userResponse.CurrentUser.DisplayName,
-            avatarUrl);
+            avatarUrl, password);
 #pragma warning restore CS0618
 
         await userProfileService.LoadProfileAsync(profileId);
@@ -99,10 +101,30 @@ public class VRChatAuthService(UserProfileService userProfileService, VRChatApiC
 
     public async Task UpdateProfileForCurrentAccountAsync()
     {
-        if (userProfileService.CurrentProfile is null)
+        if (!userProfileService.IsProfileLoaded || userProfileService.CurrentProfileSecret is null ||
+            userProfileService.CurrentProfile is null)
             throw new InvalidOperationException("Profile is not loaded");
 
-        var userResponse = await vrchatApiClient.Auth.User.GetAsUserGetResponseAsync();
+        UserRequestBuilder.UserGetResponse? userResponse;
+        try
+        {
+            userResponse = await vrchatApiClient.Auth.User.GetAsUserGetResponseAsync();
+        }
+        catch (Error apiError)
+        {
+            if (apiError.ErrorProp?.StatusCode != (int)VRChatApiErrorStatusCode.MissingCredentials)
+                throw;
+
+            var loginResult = await LoginAsync(userProfileService.CurrentProfileSecret.Username,
+                userProfileService.CurrentProfileSecret.Password);
+
+            if (loginResult.ResultType != LoginResultType.Success)
+            {
+                throw;
+            }
+
+            userResponse = await vrchatApiClient.Auth.User.GetAsUserGetResponseAsync();
+        }
 
         if (userResponse?.CurrentUser?.Id is not { } userId)
             throw new InvalidOperationException("Not logged in");
@@ -127,7 +149,8 @@ public class VRChatAuthService(UserProfileService userProfileService, VRChatApiC
             ? userIcon
             : !string.IsNullOrWhiteSpace(currentAvatarImageUrl)
                 ? currentAvatarImageUrl
-                : throw new UnexpectedApiBehaviourException("User CurrentAvatarImageUrl and UserIcon is null at same time");
+                : throw new UnexpectedApiBehaviourException(
+                    "User CurrentAvatarImageUrl and UserIcon is null at same time");
     }
 
     public string? GetAuthCookie()

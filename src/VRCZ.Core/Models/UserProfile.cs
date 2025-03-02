@@ -14,6 +14,8 @@ public class UserProfile
 public class UserProfileSecret
 {
     public List<Cookie> Cookies { get; set; } = [];
+    public required string Username { get; set; }
+    public required string Password { get; set; }
 }
 
 [JsonSerializable(typeof(UserProfile))]

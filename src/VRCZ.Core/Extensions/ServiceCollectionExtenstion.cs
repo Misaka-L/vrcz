@@ -35,6 +35,8 @@ public static class ServiceCollectionExtenstion
 
         services.AddHostedService<UserProfileHostService>();
 
+        services.AddTransient<ManagedUserProfileService>();
+
         return services;
     }
 }

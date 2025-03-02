@@ -90,10 +90,6 @@ public partial class CreateProfileDialogViewModel : ViewModelBase
 
         await MessageBox.ShowAsync($"[{user?.CurrentUser?.Id}] {user?.CurrentUser?.DisplayName}", "Login Success");
 
-        await _vrchatAuthService.CreateProfileForCurrentAccountAsync();
-
-        // await _vrchatApiClient.Logout.PutAsync();
-        //
-        // await MessageBox.ShowAsync("Logout Success", "Logout");
+        await _vrchatAuthService.CreateProfileForCurrentAccountAsync(Password);
     }
 }

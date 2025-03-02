@@ -8,9 +8,6 @@ public class NavigationService
 {
     private INavigationHost? _navigationHost;
 
-    public event EventHandler<PageViewModelBase> Navigating;
-    public event EventHandler<PageViewModelBase> Navigated;
-
     public void Register(INavigationHost navigationHost)
     {
         _navigationHost = navigationHost;

@@ -5,10 +5,15 @@
              xmlns:viewModels="clr-namespace:VRCZ.Desktop.ViewModels"
              xmlns:models="clr-namespace:VRCZ.Core.Models;assembly=VRCZ.Core"
              xmlns:u="https://irihi.tech/ursa"
+             xmlns:converters="clr-namespace:ValueConverters;assembly=ValueConverters.Avalonia"
              xmlns:views="clr-namespace:VRCZ.Desktop.ViewModels.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="views:ProfileSelectionViewModel"
              x:Class="VRCZ.Desktop.Views.ProfileSelectionView">
+
+    <UserControl.Resources>
+        <converters:NullToBoolConverter IsInverted="True" x:Key="NullToBoolInvertedConverter" />
+    </UserControl.Resources>
 
     <Interaction.Behaviors>
         <EventTriggerBehavior EventName="Loaded">
@@ -16,8 +21,11 @@
         </EventTriggerBehavior>
     </Interaction.Behaviors>
 
-    <Grid VerticalAlignment="Center" HorizontalAlignment="Center" RowDefinitions="Auto,Auto">
-        <ItemsControl ItemsSource="{Binding Profiles}">
+    <Grid VerticalAlignment="Center" HorizontalAlignment="Center" RowDefinitions="Auto,Auto,Auto">
+        <u:Banner Type="Error"
+            IsVisible="{Binding ErrorMessage, Converter={StaticResource NullToBoolInvertedConverter}}"
+            Header="Failed to load Profile" Content="{Binding ErrorMessage}" />
+        <ItemsControl Grid.Row="1" ItemsSource="{Binding Profiles}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" />
@@ -35,12 +43,13 @@
                                 </Style>
                             </u:Avatar.Styles>
                         </u:Avatar>
-                        <TextBlock FontSize="16" Margin="0,16,0,0" HorizontalAlignment="Center" Text="{Binding UserProfile.DisplayName}" />
+                        <TextBlock FontSize="16" Margin="0,16,0,0" HorizontalAlignment="Center"
+                                   Text="{Binding UserProfile.DisplayName}" />
                     </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <HyperlinkButton Grid.Row="1" Margin="0,16,0,0" HorizontalAlignment="Center" Content="New Profile"
+        <HyperlinkButton Grid.Row="2" Margin="0,16,0,0" HorizontalAlignment="Center" Content="New Profile"
                          Command="{Binding CreateProfileCommand}" />
     </Grid>
 </UserControl>

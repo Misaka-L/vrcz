@@ -24,11 +24,9 @@ public class UserProfileHostService(
     {
         try
         {
-            await vrchatPipelineService.DisconnectAsync();
-
-            if (userProfileService.IsProfileLoaded)
+            if (!userProfileService.IsProfileLoaded)
             {
-                await vrchatPipelineService.ConnectAsync();
+                await vrchatPipelineService.DisconnectAsync();
             }
         }
         catch
