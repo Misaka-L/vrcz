@@ -129,4 +129,15 @@ public class VRChatAuthService(UserProfileService userProfileService, VRChatApiC
                 ? currentAvatarImageUrl
                 : throw new UnexpectedApiBehaviourException("User CurrentAvatarImageUrl and UserIcon is null at same time");
     }
+
+    public string? GetAuthCookie()
+    {
+        var cookieContainer = userProfileService.CookieContainer;
+
+        var cookies = cookieContainer.GetCookies(new Uri("https://api.vrchat.cloud"));
+
+        var authCookie = cookies["auth"];
+
+        return authCookie?.Value;
+    }
 }

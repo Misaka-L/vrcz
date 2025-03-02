@@ -27,6 +27,14 @@ public static class ServiceCollectionExtenstion
             })
             .AttachKiotaHandlers();
 
+        services.AddSingleton<VRChatPipelineService>();
+        services.AddHttpClient<VRChatPipelineService>(client =>
+        {
+            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("VRCZ.Core", "snapshot"));
+        });
+
+        services.AddHostedService<UserProfileHostService>();
+
         return services;
     }
 }
