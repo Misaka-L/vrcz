@@ -30,7 +30,10 @@ public class VRChatPipelineService(
     public async Task ConnectAsync()
     {
         if (_receiveLoopCancellationTokenSource is not null)
+        {
             await _receiveLoopCancellationTokenSource.CancelAsync();
+            _receiveLoopCancellationTokenSource.Dispose();
+        }
 
         await ConnectAsyncInternal();
 
@@ -42,7 +45,9 @@ public class VRChatPipelineService(
 
     private async Task ConnectAsyncInternal()
     {
-        var authToken = vrchatAuthService.GetAuthCookie() ?? "";
+        _requestDisconnect = false;
+
+        var authToken = vrchatAuthService.GetAuthCookie();
 
         if (authToken is null)
             throw new InvalidOperationException("Auth token is null");
@@ -62,16 +67,20 @@ public class VRChatPipelineService(
 
     public async Task DisconnectAsync()
     {
+        _requestDisconnect = true;
+
+        if (_receiveLoopCancellationTokenSource is not null)
+        {
+            await _receiveLoopCancellationTokenSource.CancelAsync();
+            _receiveLoopCancellationTokenSource.Dispose();
+        }
+
         if (_webSocket.State is WebSocketState.Open or WebSocketState.CloseReceived or WebSocketState.CloseSent)
         {
-            _requestDisconnect = true;
-            await DisconnectAsyncInternal();
+            await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Client closed", CancellationToken.None);
         }
-    }
 
-    private async Task DisconnectAsyncInternal()
-    {
-        await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Client closed", CancellationToken.None);
+        ResetWebSocket();
     }
 
     private void ResetWebSocket()
