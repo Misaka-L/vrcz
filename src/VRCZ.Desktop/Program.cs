@@ -11,7 +11,7 @@ using Lemon.Hosting.AvaloniauiDesktop;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using VRCZ.Core.Extensions;
 using VRCZ.Desktop.Pages;
 using VRCZ.Desktop.Services;
@@ -36,15 +36,26 @@ internal sealed class Program
     [RequiresDynamicCode("Calls Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder()")]
     public static void Main(string[] args)
     {
-        var hostBuilder = Host.CreateApplicationBuilder();
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .Enrich.FromLogContext()
+            .WriteTo.Console()
+            .WriteTo.Debug()
+            .CreateLogger();
 
-        // config IConfiguration
+        var hostBuilder = Host.CreateEmptyApplicationBuilder(new HostApplicationBuilderSettings
+        {
+            Args = args,
+            ApplicationName = "VRCZ.Desktop",
+            ContentRootPath = Environment.CurrentDirectory
+        });
+
         hostBuilder.Configuration
             .AddCommandLine(args)
-            .AddEnvironmentVariables()
             .AddInMemoryCollection();
 
-        hostBuilder.Services.AddLogging(builder => builder.AddConsole());
+        hostBuilder.Services.AddSerilog();
+
         hostBuilder.Services.AddVRCZCore();
 
         RunApp(hostBuilder, args);
