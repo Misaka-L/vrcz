@@ -1,12 +1,13 @@
 ﻿using System.Net;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using VRCZ.Core.Exceptions;
 using VRCZ.Core.Models;
 using VRCZ.Core.Utils;
 
 namespace VRCZ.Core.Services;
 
-public class UserProfileService
+public class UserProfileService(ILogger<UserProfileService> logger)
 {
     public bool IsProfileLoaded => CurrentProfile is not null && CurrentProfileSecret is not null;
 
@@ -45,6 +46,8 @@ public class UserProfileService
 
     public async Task LoadProfileAsync(string profileId)
     {
+        logger.LogInformation("Loading profile {ProfileId}", profileId);
+
         var profilePath = Path.Combine(ProfileStorageUtils.GetUserProfileStoragePath(profileId));
         var profileMetaDataPath = Path.Combine(profilePath, ProfileStorageUtils.UserProfileMetaDataFileName);
         var profileSecretPath = Path.Combine(profilePath, ProfileStorageUtils.UserProfileSecretFileName);
@@ -74,6 +77,7 @@ public class UserProfileService
             CookieContainer.Add(cookie);
         }
 
+        logger.LogInformation("Profile {ProfileId} loaded", profileId);
         ProfileChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -101,10 +105,14 @@ public class UserProfileService
             throw new InvalidOperationException("No profile loaded");
         }
 
+        logger.LogInformation("Unloading profile {ProfileId}", CurrentProfile?.Id);
+
         await SaveProfileAsync();
 
         CurrentProfile = null;
         CurrentProfileSecret = null;
+
+        logger.LogInformation("Profile {ProfileId} unloaded", CurrentProfile?.Id);
         ProfileChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -149,6 +157,8 @@ public class UserProfileService
             throw new InvalidOperationException("No profile loaded");
         }
 
+        logger.LogInformation("Saving profile {ProfileId}", CurrentProfile.Id);
+
         var profileStoragePath = ProfileStorageUtils.GetUserProfileStoragePath(CurrentProfile.Id);
         var secretFilePath = Path.Combine(profileStoragePath, ProfileStorageUtils.UserProfileSecretFileName);
         var metaDataFilePath = Path.Combine(profileStoragePath, ProfileStorageUtils.UserProfileMetaDataFileName);
@@ -161,5 +171,7 @@ public class UserProfileService
             JsonSerializer.Serialize(CurrentProfileSecret, UserProfileContext.Default.UserProfileSecret));
         await File.WriteAllTextAsync(metaDataFilePath,
             JsonSerializer.Serialize(CurrentProfile, UserProfileContext.Default.UserProfile));
+
+        logger.LogInformation("Profile {ProfileId} saved", CurrentProfile.Id);
     }
 }
