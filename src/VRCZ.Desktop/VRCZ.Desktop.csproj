@@ -51,4 +51,25 @@
         <!-- Preserve Avalonia types for reflection -->
         <TrimmerRootAssembly Include="Avalonia.Controls" />
     </ItemGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+        <DefineConstants>$(DefineConstants);ENABLE_XAML_HOT_RELOAD</DefineConstants>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Condition="$(DefineConstants.Contains(ENABLE_XAML_HOT_RELOAD))" Include="Avalonia.Markup.Xaml.Loader" Version="11.2.3" />
+        <PackageReference Condition="$(DefineConstants.Contains(ENABLE_XAML_HOT_RELOAD))" Include="HotAvalonia" Version="2.1.0" />
+        <PackageReference Include="HotAvalonia.Extensions" Version="2.1.0" PrivateAssets="All" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Views\Dialogs\DialogOtpView.axaml.cs">
+        <DependentUpon>ProfileDialogOtpView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Views\Dialogs\Profile\ProfileDialogLoginView.axaml" />
+    </ItemGroup>
 </Project>

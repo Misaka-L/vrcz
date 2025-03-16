@@ -1,7 +1,7 @@
-using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using HotAvalonia;
 using Microsoft.Extensions.DependencyInjection;
 using VRCZ.Desktop.ViewModels;
 
@@ -11,6 +11,7 @@ public class App : Application
 {
     public override void Initialize()
     {
+        this.EnableHotReload();
         AvaloniaXamlLoader.Load(this);
     }
 
