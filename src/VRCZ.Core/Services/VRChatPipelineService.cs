@@ -45,6 +45,8 @@ public class VRChatPipelineService(
 
     private async Task ConnectAsyncInternal()
     {
+        logger.LogInformation("Requesting Pipeline WebSocket connection");
+
         _requestDisconnect = false;
 
         var authToken = vrchatAuthService.GetAuthCookie();
@@ -62,7 +64,11 @@ public class VRChatPipelineService(
 
         await DisconnectAsync();
 
+        logger.LogInformation("Connecting to Pipeline WebSocket");
+
         await _webSocket.ConnectAsync(webSocketUri, httpClient, CancellationToken.None);
+
+        logger.LogInformation("Connected to Pipeline WebSocket");
     }
 
     public async Task DisconnectAsync()
@@ -106,11 +112,15 @@ public class VRChatPipelineService(
                 else if (ex is not OperationCanceledException)
                 {
                     logger.LogError(ex, "WebSocket Disconnect, but a unexpected exception occurred");
+                    return;
                 }
             }
 
             if (_requestDisconnect)
+            {
+                logger.LogInformation("WebSocket disconnected");
                 return;
+            }
 
             logger.LogError("WebSocket unexpected disconnect, Reconnecting in 5 seconds...");
 
@@ -155,6 +165,8 @@ public class VRChatPipelineService(
 
                 if (result.MessageType == WebSocketMessageType.Close)
                 {
+                    logger.LogDebug("WebSocket Close message received");
+
                     await stream.DisposeAsync();
                     break;
                 }
@@ -185,7 +197,8 @@ public class VRChatPipelineService(
                 catch (Exception ex)
                 {
                     var content = await GetStreamContentAsync(stream, cancellationToken);
-                    logger.LogError(ex, "Failed to parse event, Raw: {Raw}", content);
+                    logger.LogError(ex, "Failed to parse event");
+                    logger.LogTrace("Raw event: {Raw}", content);
                     break;
                 }
 
@@ -195,13 +208,13 @@ public class VRChatPipelineService(
                 }
                 catch (UnknownWebSocketEventTypeException ex)
                 {
-                    logger.LogWarning("Unknown WebSocket event type: {Type}, Content: {Content}", ex.EventType,
-                        eventResult.Content);
+                    logger.LogWarning("Unknown WebSocket event type: {Type}", ex.EventType);
+                    logger.LogTrace("Raw event: {Raw}", eventResult.Content);
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Failed to handle event, Type: {Type}, Content: {Content}", eventResult.Type,
-                        eventResult.Content);
+                    logger.LogError(ex, "Failed to handle event, Type: {Type}", eventResult.Type);
+                    logger.LogTrace("Raw event: {Raw}", eventResult.Content);
                 }
 
                 stream.Position = 0;
