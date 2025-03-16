@@ -2,9 +2,9 @@
 
 namespace VRCZ.Desktop.Views.ProfileDialog;
 
-public partial class ProfileDialogLoginView : UserControl
+public partial class DialogOtpView : UserControl
 {
-    public ProfileDialogLoginView()
+    public DialogOtpView()
     {
         InitializeComponent();
     }

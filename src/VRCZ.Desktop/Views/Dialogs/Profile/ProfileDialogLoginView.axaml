@@ -2,16 +2,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:u="https://irihi.tech/ursa"
              xmlns:viewModels="clr-namespace:VRCZ.Desktop.ViewModels.Dialogs"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:CreateProfileDialogViewModel"
-             x:Class="VRCZ.Desktop.Views.ProfileDialog.ProfileDialogOtpView">
+             x:Class="VRCZ.Desktop.Views.Dialogs.Profile.ProfileDialogLoginView">
 
-    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-        <u:PinCode Count="6" Classes="Large" Mode="Digit" CompleteCommand="{Binding VerifyTotpCommand}"/>
-        <TextBlock>
-            Use <HyperlinkButton>Recovery Code</HyperlinkButton> instead
-        </TextBlock>
+    <StackPanel>
+        <TextBox Watermark="Username / Email" Text="{Binding Username}" />
+        <TextBox Watermark="Password" Text="{Binding Password}" PasswordChar="*" />
+        <Button Content="Login" Command="{Binding LoginCommand}" />
+        <TextBlock Text="Using an Oculus, Steam, or Viveport account?" />
     </StackPanel>
 </UserControl>

@@ -1,6 +1,4 @@
-﻿using System.Net;
-using System.Text;
-using System.Text.RegularExpressions;
+﻿using System.Text;
 using Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options;
 using VRCZ.Core.Exceptions;
 using VRCZ.Core.Models;
@@ -57,15 +55,21 @@ public class VRChatAuthService(UserProfileService userProfileService, VRChatApiC
         throw new UnexpectedApiBehaviourException("Auth User endpoint response null body");
     }
 
-    public async Task<bool> VerifyTotpAsync(string code)
+    public async Task<bool> VerifyTwoFactorAsync(string code, TwoFactorRequired_requiresTwoFactorAuth method)
     {
-        var verifyResult = await vrchatApiClient.Auth.Twofactorauth.Totp.Verify.PostAsync(
-            new TwoFactorAuthCode
-            {
-                Code = code
-            });
+        var body = new TwoFactorAuthCode
+        {
+            Code = code
+        };
 
-        if (verifyResult?.Verified is not { } verified)
+        var result = method switch
+        {
+            TwoFactorRequired_requiresTwoFactorAuth.Otp => await vrchatApiClient.Auth.Twofactorauth.Otp.Verify.PostAsync(body),
+            TwoFactorRequired_requiresTwoFactorAuth.Totp => await vrchatApiClient.Auth.Twofactorauth.Totp.Verify.PostAsync(body),
+            _ => throw new NotImplementedException()
+        };
+
+        if (result?.Verified is not { } verified)
             throw new UnexpectedApiBehaviourException("Auth Twofactorauth Totp Verify endpoint response null body");
 
         return verified;
@@ -126,8 +130,21 @@ public class VRChatAuthService(UserProfileService userProfileService, VRChatApiC
             userResponse = await vrchatApiClient.Auth.User.GetAsUserGetResponseAsync();
         }
 
+        if (userResponse?.TwoFactorRequired is { } twoFactorRequired)
+        {
+            var availableMethods = twoFactorRequired.RequiresTwoFactorAuth?
+                .Where(method => method is not null)
+                .OfType<TwoFactorRequired_requiresTwoFactorAuth>()
+                .ToArray() ?? [];
+
+            if (availableMethods.Length == 0)
+                throw new UnexpectedApiBehaviourException("TwoFactorRequired.RequiresTwoFactorAuth is empty");
+
+            throw new RequireRefreshTwoFactorException(availableMethods);
+        }
+
         if (userResponse?.CurrentUser?.Id is not { } userId)
-            throw new InvalidOperationException("Not logged in");
+            throw new UnexpectedApiBehaviourException("Api didn't require two factor but didn't return user id");
 
         if (userProfileService.CurrentProfile.Id != userId)
             throw new InvalidOperationException("Api response user id is not same with loaded profile id");

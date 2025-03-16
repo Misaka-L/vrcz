@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Ursa.Controls;
 using VRCZ.Core.Models;
 using VRCZ.Core.Services;
-using VRCZ.Desktop.Views;
+using VRCZ.Desktop.ViewModels.Views.Dialogs;
+using VRCZ.Desktop.Views.Dialogs.Profile;
 using VRCZ.Desktop.Views.ProfileDialog;
 using VRCZ.VRChatApi.Generated;
 using VRCZ.VRChatApi.Generated.Models;
@@ -24,13 +24,15 @@ public partial class CreateProfileDialogViewModel : ViewModelBase
 
     private readonly VRChatAuthService _vrchatAuthService;
     private readonly VRChatApiClient _vrchatApiClient;
+    private readonly ManagedUserProfileService _managedUserProfileService;
 
-    public CreateProfileDialogViewModel(VRChatAuthService vrchatAuthService, VRChatApiClient vrchatApiClient)
+    public CreateProfileDialogViewModel(VRChatAuthService vrchatAuthService, VRChatApiClient vrchatApiClient,
+        ManagedUserProfileService managedUserProfileService)
     {
         _vrchatAuthService = vrchatAuthService;
         _vrchatApiClient = vrchatApiClient;
 
-        CurrentView = new ProfileDialogLoginView()
+        CurrentView = new ProfileDialogLoginView
         {
             DataContext = this
         };
@@ -46,7 +48,7 @@ public partial class CreateProfileDialogViewModel : ViewModelBase
             Available2FAMethods = loginResult.Available2FAMethods ?? [];
             if (loginResult.ResultType == LoginResultType.TwoFactorRequired)
             {
-                CurrentView = new ProfileDialogOtpView
+                CurrentView = new DialogOtpView
                 {
                     DataContext = this
                 };
@@ -70,26 +72,21 @@ public partial class CreateProfileDialogViewModel : ViewModelBase
     [RelayCommand]
     private void ToOtpView()
     {
-        CurrentView = new ProfileDialogOtpView
+        CurrentView = new DialogOtpView
         {
-            DataContext = this
+            DataContext = new DialogOtpViewModel(VerifyTotp)
         };
     }
 
-    [RelayCommand]
-    private async Task VerifyTotp(IList<string>? codeDigits)
+    private async Task VerifyTotp(string code, TwoFactorRequired_requiresTwoFactorAuth method)
     {
-        if (codeDigits is null)
-            return;
-
-        var code = string.Join("", codeDigits);
-
-        await _vrchatAuthService.VerifyTotpAsync(code);
+        await _vrchatAuthService.VerifyTwoFactorAsync(code, method);
 
         var user = await _vrchatApiClient.Auth.User.GetAsUserGetResponseAsync();
 
         await MessageBox.ShowAsync($"[{user?.CurrentUser?.Id}] {user?.CurrentUser?.DisplayName}", "Login Success");
 
         await _vrchatAuthService.CreateProfileForCurrentAccountAsync(Password);
+        // await _managedUserProfileService.LoadProfileAsync();
     }
 }
