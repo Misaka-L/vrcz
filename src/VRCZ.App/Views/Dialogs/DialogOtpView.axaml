@@ -1,0 +1,17 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:u="https://irihi.tech/ursa"
+             xmlns:dialogs="clr-namespace:VRCZ.App.ViewModels.Views.Dialogs"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="dialogs:DialogOtpViewModel"
+             x:Class="VRCZ.App.Views.Dialogs.DialogOtpView">
+
+    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+        <u:PinCode Count="6" Classes="Large" Mode="Digit" CompleteCommand="{Binding VerifyTotpCommand}"/>
+        <TextBlock>
+            Use <HyperlinkButton>Recovery Code</HyperlinkButton> instead
+        </TextBlock>
+    </StackPanel>
+</UserControl>

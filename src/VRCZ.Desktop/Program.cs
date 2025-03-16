@@ -13,14 +13,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
+using VRCZ.App;
+using VRCZ.App.Pages;
+using VRCZ.App.Services;
+using VRCZ.App.ViewModels;
+using VRCZ.App.ViewModels.Dialogs;
+using VRCZ.App.ViewModels.Pages;
+using VRCZ.App.ViewModels.Views;
+using VRCZ.App.ViewModels.Views.MainView;
 using VRCZ.Core.Extensions;
-using VRCZ.Desktop.Pages;
-using VRCZ.Desktop.Services;
-using VRCZ.Desktop.ViewModels;
-using VRCZ.Desktop.ViewModels.Dialogs;
-using VRCZ.Desktop.ViewModels.Pages;
-using VRCZ.Desktop.ViewModels.Views;
-using VRCZ.Desktop.ViewModels.Views.MainView;
 
 namespace VRCZ.Desktop;
 
@@ -97,7 +98,7 @@ internal sealed class Program
         hostBuilder.Services.AddTransient<MainNavMenuViewModel>();
         hostBuilder.Services.AddTransient<HomeViewModel>();
 
-        hostBuilder.Services.AddAvaloniauiDesktopApplication<App>(ConfigAvaloniaAppBuilder);
+        hostBuilder.Services.AddAvaloniauiDesktopApplication<App.App>(ConfigAvaloniaAppBuilder);
         hostBuilder.Services.AddMainWindow<MainWindow, MainWindowViewModel>();
         hostBuilder.Services.AddApplicationLifetime<MainWindow>(_ => new ClassicDesktopStyleApplicationLifetime
         {
@@ -115,7 +116,7 @@ internal sealed class Program
 
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
+        => AppBuilder.Configure<App.App>()
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace();
