@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
 using VRCZ.Core.Extensions;
 using VRCZ.Desktop.Pages;
 using VRCZ.Desktop.Services;
@@ -39,7 +40,7 @@ internal sealed class Program
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
             .Enrich.FromLogContext()
-            .WriteTo.Console()
+            .WriteTo.Console(theme: AnsiConsoleTheme.Literate, applyThemeToRedirectedOutput: true)
             .WriteTo.Debug()
             .CreateLogger();
 
