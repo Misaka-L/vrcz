@@ -100,7 +100,7 @@ public class UserProfileService(ILogger<UserProfileService> logger)
 
     public async Task UnloadProfileAsync()
     {
-        if (IsProfileLoaded)
+        if (!IsProfileLoaded)
         {
             throw new InvalidOperationException("No profile loaded");
         }
@@ -112,7 +112,7 @@ public class UserProfileService(ILogger<UserProfileService> logger)
         CurrentProfile = null;
         CurrentProfileSecret = null;
 
-        logger.LogInformation("Profile {ProfileId} unloaded", CurrentProfile?.Id);
+        logger.LogInformation("Profile unloaded");
         ProfileChanged?.Invoke(this, EventArgs.Empty);
     }
 
