@@ -8,18 +8,19 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <RuntimeHostConfigurationOption Include="System.Text.Json.Serialization.RespectNullableAnnotationsDefault" Value="true" />
-        <RuntimeHostConfigurationOption Include="System.Text.Json.Serialization.RespectRequiredConstructorParametersDefault" Value="true" />
+        <RuntimeHostConfigurationOption Include="System.Text.Json.Serialization.RespectNullableAnnotationsDefault" Value="true"/>
+        <RuntimeHostConfigurationOption Include="System.Text.Json.Serialization.RespectRequiredConstructorParametersDefault" Value="true"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.2" />
-      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.2" />
-      <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
+        <PackageReference Include="Microsoft.Extensions.Http" />
+        <PackageReference Include="Riok.Mapperly" ExcludeAssets="runtime" PrivateAssets="all"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\VRCZ.VRChatApi.Generated\VRCZ.VRChatApi.Generated.csproj" />
+        <ProjectReference Include="..\VRCZ.VRChatApi.Generated\VRCZ.VRChatApi.Generated.csproj"/>
     </ItemGroup>
 
 </Project>
