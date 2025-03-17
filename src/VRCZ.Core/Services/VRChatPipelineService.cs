@@ -47,8 +47,6 @@ public class VRChatPipelineService(
     {
         logger.LogInformation("Requesting Pipeline WebSocket connection");
 
-        _requestDisconnect = false;
-
         var authToken = vrchatAuthService.GetAuthCookie();
 
         if (authToken is null)
@@ -63,6 +61,8 @@ public class VRChatPipelineService(
         var webSocketUri = webSocketUriBuilder.Uri;
 
         await DisconnectAsync();
+
+        _requestDisconnect = false;
 
         logger.LogInformation("Connecting to Pipeline WebSocket");
 
