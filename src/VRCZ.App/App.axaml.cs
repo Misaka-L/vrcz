@@ -3,7 +3,9 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using HotAvalonia;
 using Microsoft.Extensions.DependencyInjection;
+using VRCZ.App.Pages;
 using VRCZ.App.ViewModels;
+using VRCZ.App.ViewModels.Pages;
 
 namespace VRCZ.App;
 
@@ -23,6 +25,8 @@ public class App : Application
 
     public override void Initialize()
     {
+        ViewLocator.Register<HomeViewModel, HomePage>();
+
         this.EnableHotReload();
         AvaloniaXamlLoader.Load(this);
     }
