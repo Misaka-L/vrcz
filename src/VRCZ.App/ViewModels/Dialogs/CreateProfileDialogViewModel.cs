@@ -48,10 +48,7 @@ public partial class CreateProfileDialogViewModel : ViewModelBase
             Available2FAMethods = loginResult.Available2FAMethods ?? [];
             if (loginResult.ResultType == LoginResultType.TwoFactorRequired)
             {
-                CurrentView = new DialogOtpView
-                {
-                    DataContext = this
-                };
+                ToOtpView();
             }
         }
         catch
