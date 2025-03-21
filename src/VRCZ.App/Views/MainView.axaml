@@ -6,6 +6,8 @@
              xmlns:u="https://irihi.tech/ursa"
              xmlns:mainView="clr-namespace:VRCZ.App.ViewModels.Views.MainView"
              xmlns:converters="clr-namespace:VRCZ.App.Converters"
+             xmlns:models="clr-namespace:VRCZ.VRChatApi.Generated.Models;assembly=VRCZ.VRChatApi.Generated"
+             xmlns:friendsPanel="clr-namespace:VRCZ.App.ViewModels.FriendsPanel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="mainView:MainViewModel"
              x:Class="VRCZ.App.Views.MainView">
@@ -64,6 +66,8 @@
                 </StackPanel>
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                     <u:Avatar Classes="Small" />
+                    <TextBlock Text="{Binding LoggedInUser.DisplayName}"/>
+                    <TextBlock Text="{Binding LoggedInUser.StatusDescription}"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -123,9 +127,24 @@
                     CornerRadius="0"
                     Theme="{DynamicResource CardBorder}"
                     IsVisible="{Binding CurrentPage.FullPage, Converter={StaticResource InverseBoolConverter}, FallbackValue=true}">
-                <StackPanel>
-                    <Button Content="Navigate" Command="{Binding GoHomeCommand}" />
-                </StackPanel>
+                <ScrollViewer>
+                    <ItemsControl ItemsSource="{Binding Friends.Friends}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="friendsPanel:FriendItemViewModel">
+                                <StackPanel Margin="5">
+                                    <!-- <TextBlock Text="{Binding Id}"/> -->
+                                    <TextBlock Text="{Binding User.DisplayName}"/>
+                                    <TextBlock Text="{Binding Location}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
             </Border>
         </Grid>
     </Grid>

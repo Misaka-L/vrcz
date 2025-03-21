@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Ursa.Controls;
 using VRCZ.App.Dialogs;
@@ -17,6 +18,7 @@ public partial class ProfileSelectionViewModel(
     RemoteImageLoadService remoteImageLoadService,
     ManagedUserProfileService managedUserProfileService,
     VRChatAuthService vrchatAuthService,
+    WeakReferenceMessenger weakReferenceMessenger,
     IServiceProvider serviceProvider) : ViewModelBase
 {
     [ObservableProperty] private UserProfileItemViewModel[] _profiles = [];
@@ -30,7 +32,8 @@ public partial class ProfileSelectionViewModel(
 
         Profiles = profiles
             .Select(profile =>
-                new UserProfileItemViewModel(profile, remoteImageLoadService, managedUserProfileService, HandleTwoFactor))
+                new UserProfileItemViewModel(profile, remoteImageLoadService, managedUserProfileService,
+                    weakReferenceMessenger, HandleTwoFactor))
             .ToArray();
 
         foreach (var userProfileItemViewModel in Profiles)

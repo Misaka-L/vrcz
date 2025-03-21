@@ -103,7 +103,7 @@ public class VRChatAuthService(UserProfileService userProfileService, VRChatApiC
         await userProfileService.LoadProfileAsync(profileId);
     }
 
-    public async Task UpdateProfileForCurrentAccountAsync()
+    public async ValueTask<CurrentUser> UpdateProfileForCurrentAccountAsync()
     {
         if (!userProfileService.IsProfileLoaded || userProfileService.CurrentProfileSecret is null ||
             userProfileService.CurrentProfile is null)
@@ -158,6 +158,8 @@ public class VRChatAuthService(UserProfileService userProfileService, VRChatApiC
         userProfileService.CurrentProfile.AvatarUrl = avatarUrl;
 
         await userProfileService.SaveProfileAsync();
+
+        return userResponse.CurrentUser;
     }
 
     private string GetAvatarUrl(string? userIcon, string? currentAvatarImageUrl)

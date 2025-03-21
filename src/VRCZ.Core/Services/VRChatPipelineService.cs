@@ -5,16 +5,20 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization.Metadata;
 using System.Web;
 using Microsoft.Extensions.Logging;
+using Microsoft.Kiota.Abstractions.Serialization;
 using VRCZ.Core.Exceptions;
 using VRCZ.Core.Exceptions.Pipeline;
+using VRCZ.Core.Models;
 using VRCZ.Core.Models.VRChat.WebSocket;
 using VRCZ.Core.Models.VRChat.WebSocket.Payload;
+using VRCZ.VRChatApi.Generated.Models;
 
 namespace VRCZ.Core.Services;
 
 public class VRChatPipelineService(
     HttpClient httpClient,
     VRChatAuthService vrchatAuthService,
+    VRChatTrackedEntitiesService trackedEntitiesService,
     ILogger<VRChatPipelineService> logger)
 {
     public event EventHandler<VRChatWebSocketPayloadBase>? EventReceived;
@@ -204,7 +208,7 @@ public class VRChatPipelineService(
 
                 try
                 {
-                    HandleEvent(eventResult);
+                    await HandleEventAsync(eventResult);
                 }
                 catch (UnknownWebSocketEventTypeException ex)
                 {
@@ -234,7 +238,7 @@ public class VRChatPipelineService(
         return await reader.ReadToEndAsync(cancellationToken);
     }
 
-    private void HandleEvent(VRChatWebSocketEvent eventResult)
+    private async Task HandleEventAsync(VRChatWebSocketEvent eventResult)
     {
         switch (eventResult.Type)
         {
@@ -258,16 +262,101 @@ public class VRChatPipelineService(
             case "user-badge-unassigned":
             case "content-refresh":
                 var jsonTypeInfo = GetPayloadJsonTypeInfo(eventResult.Type);
+                var contentNodes = JsonNode.Parse(eventResult.Content!);
 
-                if (JsonSerializer.Deserialize(eventResult.Content!,
-                        jsonTypeInfo) is VRChatWebSocketPayloadBase payload)
-                {
-                    EventReceived?.Invoke(this, payload);
-                }
-                else
+                if (contentNodes?.Deserialize(jsonTypeInfo) is not VRChatWebSocketPayloadBase payload)
                 {
                     logger.LogWarning("Failed to parse payload, Raw: {Raw}", eventResult.Content);
+                    break;
                 }
+
+                if (payload is IVRChatWebSocketWorldPayload worldPayload)
+                {
+                    // TODO
+                }
+
+                if (payload is IVRChatCurrentUserPayload or IVRChatWebSocketFriendUserPayload)
+                {
+                    if (contentNodes["user"] is not { } userNode)
+                        throw new UnexpectedApiBehaviourException("event user field not exist");
+
+                    switch (payload)
+                    {
+                        case IVRChatCurrentUserPayload currentUserPayload:
+                            var currentUser =
+                                await KiotaJsonSerializer.DeserializeAsync(userNode.ToJsonString(),
+                                    CurrentUser.CreateFromDiscriminatorValue);
+
+                            if (currentUser is null)
+                                throw new UnexpectedApiBehaviourException("event user is null");
+
+                            currentUserPayload.User = currentUser;
+                            break;
+                        case IVRChatWebSocketFriendUserPayload limitedUserPayload:
+                            var websocketFriend = JsonSerializer.Deserialize(userNode.ToJsonString(),
+                                VRChatWebSocketEventContext.Default.VRChatWebSocketFriendUser);
+
+                            if (websocketFriend is null)
+                                throw new UnexpectedApiBehaviourException("event user is null");
+
+                            limitedUserPayload.User = websocketFriend;
+                            break;
+                    }
+                }
+
+                switch (payload)
+                {
+                    case FriendDeleteEvent friendDeleteEvent:
+                        trackedEntitiesService.RemoveFriend(friendDeleteEvent.UserId);
+                        break;
+                    case IVRChatCurrentUserPayload currentUserPayload:
+                        trackedEntitiesService.SetLoggedInUser(currentUserPayload.User!);
+                        break;
+                    case IVRChatWebSocketFriendUserPayload limitedUserPayload:
+                        trackedEntitiesService.AddOrUpdateFriend(limitedUserPayload.User!);
+                        break;
+                }
+
+                switch (payload)
+                {
+                    case FriendOfflineEvent friendOfflineEvent:
+                        trackedEntitiesService.AddOrUpdateUserLocation(friendOfflineEvent.UserId,
+                            new UserLocation(UserLocationType.Offline));
+                        break;
+                    case IVRChatWebSocketLocationPayload locationPayload:
+                        var userId = locationPayload switch
+                        {
+                            IVRChatCurrentUserPayload currentUserPayload => currentUserPayload.User?.Id ??
+                                                                            throw new UnexpectedApiBehaviourException(
+                                                                                "currentUserPayload.User is null"),
+                            IVRChatWebSocketFriendUserPayload friendUserPayload => friendUserPayload.User?.Id ??
+                                throw new UnexpectedApiBehaviourException("friendUserPayload.User is null"),
+                            _ => throw new UnexpectedApiBehaviourException("Unknown location payload type")
+                        };
+
+                        if (!string.IsNullOrWhiteSpace(locationPayload.Location) && !locationPayload.Location.Contains("traveling"))
+                        {
+                            trackedEntitiesService.AddOrUpdateUserLocation(userId,
+                                UserLocation.Parse(locationPayload.Location));
+                            break;
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(locationPayload.TravelingToLocation))
+                        {
+                            trackedEntitiesService.AddOrUpdateUserLocation(userId,
+                                UserLocation.Parse(locationPayload.TravelingToLocation) with
+                                {
+                                    LocationType = UserLocationType.Traveling
+                                });
+                            break;
+                        }
+
+                        trackedEntitiesService.AddOrUpdateUserLocation(userId,
+                            new UserLocation(UserLocationType.Unknown));
+                        break;
+                }
+
+                EventReceived?.Invoke(this, payload);
 
                 break;
             case "see-notification":

@@ -13,6 +13,7 @@ public partial class UserProfileItemViewModel(
     UserProfile userProfile,
     RemoteImageLoadService remoteImageLoadService,
     ManagedUserProfileService managedUserProfileService,
+    WeakReferenceMessenger weakReferenceMessenger,
     Func<TwoFactorRequired_requiresTwoFactorAuth[], Task> handleTwoFactor) : ViewModelBase
 {
     public UserProfile UserProfile => userProfile;
@@ -27,7 +28,7 @@ public partial class UserProfileItemViewModel(
         {
             await managedUserProfileService.LoadProfileAsync(UserProfile.Id, handleTwoFactor);
 
-            WeakReferenceMessenger.Default.Send<ShowMainViewMessage>();
+            weakReferenceMessenger.Send<ShowMainViewMessage>();
         }
         catch (Exception ex)
         {

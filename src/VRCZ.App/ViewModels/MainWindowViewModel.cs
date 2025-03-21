@@ -12,7 +12,8 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     [ObservableProperty] private ViewModelBase _currentView;
 
-    public MainWindowViewModel(UserProfileService userProfileService, IServiceProvider serviceProvider)
+    public MainWindowViewModel(UserProfileService userProfileService, IServiceProvider serviceProvider,
+        WeakReferenceMessenger weakReferenceMessenger)
     {
         CurrentView = userProfileService.IsProfileLoaded
             ? serviceProvider.GetRequiredService<MainViewModel>()
@@ -28,7 +29,7 @@ public partial class MainWindowViewModel : ViewModelBase
             CurrentView = serviceProvider.GetRequiredService<ProfileSelectionViewModel>();
         };
 
-        WeakReferenceMessenger.Default.Register<ShowMainViewMessage>(this, (_, _) =>
+        weakReferenceMessenger.Register<ShowMainViewMessage>(this, (_, _) =>
         {
             if (!userProfileService.IsProfileLoaded)
                 return;

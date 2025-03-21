@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using VRCZ.Core.Models.VRChat.WebSocket.Payload;
+using VRCZ.VRChatApi.Generated.Models;
 
 namespace VRCZ.Core.Models.VRChat.WebSocket;
 
@@ -14,8 +15,30 @@ public record VRChatWebSocketErrorEvent(
 
 public abstract record VRChatWebSocketPayloadBase;
 
+public interface IVRChatCurrentUserPayload
+{
+    public CurrentUser? User { get; set; }
+}
+
+public interface IVRChatWebSocketFriendUserPayload
+{
+    public VRChatWebSocketFriendUser? User { get; set; }
+}
+
+public interface IVRChatWebSocketWorldPayload
+{
+    public VRChatWebSocketWorld? World { get; init; }
+}
+
+public interface IVRChatWebSocketLocationPayload
+{
+    public string Location { get; init; }
+    public string TravelingToLocation { get; init; }
+}
+
 [JsonSerializable(typeof(VRChatWebSocketEvent))]
 [JsonSerializable(typeof(VRChatWebSocketErrorEvent))]
+[JsonSerializable(typeof(VRChatWebSocketFriendUser))]
 [JsonSerializable(typeof(FriendAddEvent)),
  JsonSerializable(typeof(FriendDeleteEvent)),
  JsonSerializable(typeof(FriendOnlineEvent)),
@@ -43,5 +66,5 @@ public abstract record VRChatWebSocketPayloadBase;
  JsonSerializable(typeof(UserBadgeUnassignedEvent)),
  JsonSerializable(typeof(ContentRefreshEvent))
 ]
-[JsonSourceGenerationOptions(RespectRequiredConstructorParameters = true, RespectNullableAnnotations = true)]
+[JsonSourceGenerationOptions(RespectRequiredConstructorParameters = true, RespectNullableAnnotations = true, PropertyNamingPolicy = JsonKnownNamingPolicy.SnakeCaseLower)]
 public partial class VRChatWebSocketEventContext : JsonSerializerContext;

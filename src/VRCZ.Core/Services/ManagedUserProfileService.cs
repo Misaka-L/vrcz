@@ -6,7 +6,8 @@ namespace VRCZ.Core.Services;
 public class ManagedUserProfileService(
     VRChatPipelineService vrchatPipelineService,
     VRChatAuthService vrchatAuthService,
-    UserProfileService userProfileService)
+    UserProfileService userProfileService,
+    VRChatTrackedEntitiesService vrchatTrackedEntitiesService)
 {
     public async Task LoadProfileAsync(string userId,
         Func<TwoFactorRequired_requiresTwoFactorAuth[], Task>? handleTwoFactorRequired = null)
@@ -15,9 +16,10 @@ public class ManagedUserProfileService(
         {
             await userProfileService.LoadProfileAsync(userId);
 
+            CurrentUser currentUser;
             try
             {
-                await vrchatAuthService.UpdateProfileForCurrentAccountAsync();
+                currentUser = await vrchatAuthService.UpdateProfileForCurrentAccountAsync();
             }
             catch (RequireRefreshTwoFactorException requireRefreshTwoFactorException)
             {
@@ -25,8 +27,11 @@ public class ManagedUserProfileService(
 
                 await handleTwoFactorRequired(requireRefreshTwoFactorException.AvailableTwoFactor);
 
-                await vrchatAuthService.UpdateProfileForCurrentAccountAsync();
+                currentUser = await vrchatAuthService.UpdateProfileForCurrentAccountAsync();
             }
+
+            vrchatTrackedEntitiesService.SetLoggedInUser(currentUser);
+            await vrchatTrackedEntitiesService.GetFriendsAsync();
 
             await vrchatPipelineService.ConnectAsync();
         }

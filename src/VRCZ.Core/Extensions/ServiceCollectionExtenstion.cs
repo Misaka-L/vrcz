@@ -37,6 +37,8 @@ public static class ServiceCollectionExtenstion
 
         services.AddTransient<ManagedUserProfileService>();
 
+        services.AddSingleton<VRChatTrackedEntitiesService>();
+
         return services;
     }
 }
