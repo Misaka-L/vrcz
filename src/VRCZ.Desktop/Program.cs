@@ -1,8 +1,6 @@
 ﻿using Avalonia;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 using Avalonia.Controls;
@@ -14,13 +12,8 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using VRCZ.App;
-using VRCZ.App.Pages;
-using VRCZ.App.Services;
+using VRCZ.App.Extenstions;
 using VRCZ.App.ViewModels;
-using VRCZ.App.ViewModels.Dialogs;
-using VRCZ.App.ViewModels.Pages;
-using VRCZ.App.ViewModels.Views;
-using VRCZ.App.ViewModels.Views.MainView;
 using VRCZ.Core.Extensions;
 
 namespace VRCZ.Desktop;
@@ -59,6 +52,7 @@ internal sealed class Program
         hostBuilder.Services.AddSerilog();
 
         hostBuilder.Services.AddVRCZCore();
+        hostBuilder.Services.AddVRCZApp();
 
         RunApp(hostBuilder, args);
     }
@@ -77,27 +71,6 @@ internal sealed class Program
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     private static void RunApp(HostApplicationBuilder hostBuilder, string[] args)
     {
-        ViewLocator.Register<HomeViewModel, HomePage>();
-        hostBuilder.Services.AddSingleton<NavigationService>();
-
-        hostBuilder.Services.AddTransient<RemoteImageLoadService>();
-        hostBuilder.Services.AddHttpClient<RemoteImageLoadService>(client =>
-                client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("VRCZ.Desktop", "snapshot"))
-            )
-            .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
-            {
-                PooledConnectionLifetime = TimeSpan.FromMinutes(2),
-            });
-
-        hostBuilder.Services.AddSingleton<TrayMenuViewModel>();
-        hostBuilder.Services.AddTransient<MainViewModel>();
-        hostBuilder.Services.AddTransient<ProfileSelectionViewModel>();
-        hostBuilder.Services.AddTransient<CreateProfileDialogViewModel>();
-        hostBuilder.Services.AddSingleton<MainWindowViewModel>();
-
-        hostBuilder.Services.AddTransient<MainNavMenuViewModel>();
-        hostBuilder.Services.AddTransient<HomeViewModel>();
-
         hostBuilder.Services.AddAvaloniauiDesktopApplication<App.App>(ConfigAvaloniaAppBuilder);
         hostBuilder.Services.AddMainWindow<MainWindow, MainWindowViewModel>();
         hostBuilder.Services.AddApplicationLifetime<MainWindow>(_ => new ClassicDesktopStyleApplicationLifetime
