@@ -19,8 +19,8 @@ public record UserLocationEvent(
     [property: JsonPropertyName("instance")]
     string InstanceId,
     [property: JsonPropertyName("worldId")]
-    string? WorldId,
-    [property: JsonPropertyName("world")] World? World
+    string? WorldId = null,
+    [property: JsonPropertyName("world")] World? World = null
 ) : VRChatWebSocketPayloadBase, IVRChatCurrentUserPayload, IVRChatWebSocketLocationPayload
 {
     [JsonIgnore] public CurrentUser? User { get; set; }
