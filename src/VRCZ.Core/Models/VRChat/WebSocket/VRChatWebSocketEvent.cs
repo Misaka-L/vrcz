@@ -27,13 +27,13 @@ public interface IVRChatWebSocketFriendUserPayload
 
 public interface IVRChatWebSocketWorldPayload
 {
-    public VRChatWebSocketWorld? World { get; init; }
+    public VRChatWebSocketWorld? World { get; }
 }
 
 public interface IVRChatWebSocketLocationPayload
 {
     public string Location { get; init; }
-    public string TravelingToLocation { get; init; }
+    public string TravelingToLocation { get; }
 }
 
 [JsonSerializable(typeof(VRChatWebSocketEvent))]
