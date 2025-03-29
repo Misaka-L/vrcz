@@ -17,9 +17,20 @@ public record UserLocation(
                 return new UserLocation(UserLocationType.Traveling);
         }
 
+
         var locationStringParts = locationString.Split(':');
         if (locationStringParts.Length != 2)
             throw new ArgumentException("Invalid location string", nameof(locationString));
+
+        if (locationStringParts[0] == "offline" || locationStringParts[1] == "offline")
+        {
+            return new UserLocation(UserLocationType.Offline);
+        }
+
+        if (locationStringParts[0] == "private" || locationStringParts[1] == "private")
+        {
+            return new UserLocation(UserLocationType.Private);
+        }
 
         if (locationStringParts[0] == "traveling" || locationStringParts[1] == "traveling")
         {
