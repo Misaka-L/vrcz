@@ -9,57 +9,61 @@ using System.Threading.Tasks;
 using System.Threading;
 using System;
 using VRCZ.VRChatApi.Generated.Models;
-namespace VRCZ.VRChatApi.Generated.Favorites.Item
+using VRCZ.VRChatApi.Generated.Users.Item.Item.Persist.Exists;
+namespace VRCZ.VRChatApi.Generated.Users.Item.Item.Persist
 {
     /// <summary>
-    /// Builds and executes requests for operations under \favorites\{favoriteId}
+    /// Builds and executes requests for operations under \users\{user-id}\{worldId}\persist
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-    public partial class WithFavoriteItemRequestBuilder : BaseRequestBuilder
+    public partial class PersistRequestBuilder : BaseRequestBuilder
     {
+        /// <summary>The exists property</summary>
+        public global::VRCZ.VRChatApi.Generated.Users.Item.Item.Persist.Exists.ExistsRequestBuilder Exists
+        {
+            get => new global::VRCZ.VRChatApi.Generated.Users.Item.Item.Persist.Exists.ExistsRequestBuilder(PathParameters, RequestAdapter);
+        }
         /// <summary>
-        /// Instantiates a new <see cref="global::VRCZ.VRChatApi.Generated.Favorites.Item.WithFavoriteItemRequestBuilder"/> and sets the default values.
+        /// Instantiates a new <see cref="global::VRCZ.VRChatApi.Generated.Users.Item.Item.Persist.PersistRequestBuilder"/> and sets the default values.
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public WithFavoriteItemRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/favorites/{favoriteId}", pathParameters)
+        public PersistRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/users/{user%2Did}/{worldId}/persist", pathParameters)
         {
         }
         /// <summary>
-        /// Instantiates a new <see cref="global::VRCZ.VRChatApi.Generated.Favorites.Item.WithFavoriteItemRequestBuilder"/> and sets the default values.
+        /// Instantiates a new <see cref="global::VRCZ.VRChatApi.Generated.Users.Item.Item.Persist.PersistRequestBuilder"/> and sets the default values.
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public WithFavoriteItemRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/favorites/{favoriteId}", rawUrl)
+        public PersistRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/users/{user%2Did}/{worldId}/persist", rawUrl)
         {
         }
         /// <summary>
-        /// Remove a favorite from your favorites list.
+        /// Deletes the user&apos;s persistence data for a given world
         /// </summary>
-        /// <returns>A <see cref="global::VRCZ.VRChatApi.Generated.Models.Success"/></returns>
+        /// <returns>A <see cref="Stream"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::VRCZ.VRChatApi.Generated.Models.Error">When receiving a 401 status code</exception>
-        /// <exception cref="global::VRCZ.VRChatApi.Generated.Models.Error">When receiving a 404 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::VRCZ.VRChatApi.Generated.Models.Success?> DeleteAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<Stream?> DeleteAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::VRCZ.VRChatApi.Generated.Models.Success> DeleteAsync(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<Stream> DeleteAsync(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToDeleteRequestInformation(requestConfiguration);
             var errorMapping = new Dictionary<string, ParsableFactory<IParsable>>
             {
                 { "401", global::VRCZ.VRChatApi.Generated.Models.Error.CreateFromDiscriminatorValue },
-                { "404", global::VRCZ.VRChatApi.Generated.Models.Error.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<global::VRCZ.VRChatApi.Generated.Models.Success>(requestInfo, global::VRCZ.VRChatApi.Generated.Models.Success.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendPrimitiveAsync<Stream>(requestInfo, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Remove a favorite from your favorites list.
+        /// Deletes the user&apos;s persistence data for a given world
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -80,18 +84,18 @@ namespace VRCZ.VRChatApi.Generated.Favorites.Item
         /// <summary>
         /// Returns a request builder with the provided arbitrary URL. Using this method means any other path or query parameters are ignored.
         /// </summary>
-        /// <returns>A <see cref="global::VRCZ.VRChatApi.Generated.Favorites.Item.WithFavoriteItemRequestBuilder"/></returns>
+        /// <returns>A <see cref="global::VRCZ.VRChatApi.Generated.Users.Item.Item.Persist.PersistRequestBuilder"/></returns>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
-        public global::VRCZ.VRChatApi.Generated.Favorites.Item.WithFavoriteItemRequestBuilder WithUrl(string rawUrl)
+        public global::VRCZ.VRChatApi.Generated.Users.Item.Item.Persist.PersistRequestBuilder WithUrl(string rawUrl)
         {
-            return new global::VRCZ.VRChatApi.Generated.Favorites.Item.WithFavoriteItemRequestBuilder(rawUrl, RequestAdapter);
+            return new global::VRCZ.VRChatApi.Generated.Users.Item.Item.Persist.PersistRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class WithFavoriteItemRequestBuilderDeleteRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
+        public partial class PersistRequestBuilderDeleteRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

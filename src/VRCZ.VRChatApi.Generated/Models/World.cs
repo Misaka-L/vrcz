@@ -64,14 +64,6 @@ namespace VRCZ.VRChatApi.Generated.Models
 #else
         public string ImageUrl { get; set; }
 #endif
-        /// <summary>Will always be an empty list when unauthenticated.</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public List<UntypedNode>? Instances { get; set; }
-#nullable restore
-#else
-        public List<UntypedNode> Instances { get; set; }
-#endif
         /// <summary>The labsPublicationDate property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -215,7 +207,6 @@ namespace VRCZ.VRChatApi.Generated.Models
                 { "heat", n => { Heat = n.GetIntValue(); } },
                 { "id", n => { Id = n.GetStringValue(); } },
                 { "imageUrl", n => { ImageUrl = n.GetStringValue(); } },
-                { "instances", n => { Instances = n.GetCollectionOfPrimitiveValues<UntypedNode>()?.AsList(); } },
                 { "labsPublicationDate", n => { LabsPublicationDate = n.GetStringValue(); } },
                 { "name", n => { Name = n.GetStringValue(); } },
                 { "namespace", n => { Namespace = n.GetStringValue(); } },
@@ -255,7 +246,6 @@ namespace VRCZ.VRChatApi.Generated.Models
             writer.WriteIntValue("heat", Heat);
             writer.WriteStringValue("id", Id);
             writer.WriteStringValue("imageUrl", ImageUrl);
-            writer.WriteCollectionOfPrimitiveValues<UntypedNode>("instances", Instances);
             writer.WriteStringValue("labsPublicationDate", LabsPublicationDate);
             writer.WriteStringValue("name", Name);
             writer.WriteStringValue("namespace", Namespace);

@@ -15,9 +15,9 @@ namespace VRCZ.VRChatApi.Generated.Models
     {
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData { get; set; }
-        /// <summary>obsolete, use `ageVerified` instead.`ageVerificationStatus == &quot;18+&quot;` =&gt; `ageVerified == true``ageVerificationStatus != &quot;18+&quot;` =&gt; `ageVerified == false`</summary>
+        /// <summary>`verified` is obsolete.User who have verified and are 18+ can switch to `plus18` status.</summary>
         public global::VRCZ.VRChatApi.Generated.Models.AgeVerificationStatus? AgeVerificationStatus { get; set; }
-        /// <summary>`true` if, user is age verified 18 or above. but `false`, when status is not shared. Otherwise always `false`.</summary>
+        /// <summary>`true` if, user is age verified (not 18+).</summary>
         public bool? AgeVerified { get; set; }
         /// <summary>The allowAvatarCopying property</summary>
         public bool? AllowAvatarCopying { get; set; }

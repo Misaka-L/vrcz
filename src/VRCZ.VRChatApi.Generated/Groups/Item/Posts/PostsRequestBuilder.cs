@@ -49,17 +49,17 @@ namespace VRCZ.VRChatApi.Generated.Groups.Item.Posts
         /// <summary>
         /// Get posts from a Group
         /// </summary>
-        /// <returns>A <see cref="global::VRCZ.VRChatApi.Generated.Models.GroupPost"/></returns>
+        /// <returns>A <see cref="global::VRCZ.VRChatApi.Generated.Groups.Item.Posts.PostsGetResponse"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::VRCZ.VRChatApi.Generated.Models.Error">When receiving a 401 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::VRCZ.VRChatApi.Generated.Models.GroupPost?> GetAsync(Action<RequestConfiguration<global::VRCZ.VRChatApi.Generated.Groups.Item.Posts.PostsRequestBuilder.PostsRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::VRCZ.VRChatApi.Generated.Groups.Item.Posts.PostsGetResponse?> GetAsPostsGetResponseAsync(Action<RequestConfiguration<global::VRCZ.VRChatApi.Generated.Groups.Item.Posts.PostsRequestBuilder.PostsRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::VRCZ.VRChatApi.Generated.Models.GroupPost> GetAsync(Action<RequestConfiguration<global::VRCZ.VRChatApi.Generated.Groups.Item.Posts.PostsRequestBuilder.PostsRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::VRCZ.VRChatApi.Generated.Groups.Item.Posts.PostsGetResponse> GetAsPostsGetResponseAsync(Action<RequestConfiguration<global::VRCZ.VRChatApi.Generated.Groups.Item.Posts.PostsRequestBuilder.PostsRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToGetRequestInformation(requestConfiguration);
@@ -67,7 +67,31 @@ namespace VRCZ.VRChatApi.Generated.Groups.Item.Posts
             {
                 { "401", global::VRCZ.VRChatApi.Generated.Models.Error.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<global::VRCZ.VRChatApi.Generated.Models.GroupPost>(requestInfo, global::VRCZ.VRChatApi.Generated.Models.GroupPost.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::VRCZ.VRChatApi.Generated.Groups.Item.Posts.PostsGetResponse>(requestInfo, global::VRCZ.VRChatApi.Generated.Groups.Item.Posts.PostsGetResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+        }
+        /// <summary>
+        /// Get posts from a Group
+        /// </summary>
+        /// <returns>A <see cref="global::VRCZ.VRChatApi.Generated.Groups.Item.Posts.PostsResponse"/></returns>
+        /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
+        /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
+        /// <exception cref="global::VRCZ.VRChatApi.Generated.Models.Error">When receiving a 401 status code</exception>
+        [Obsolete("This method is obsolete. Use GetAsPostsGetResponseAsync instead.")]
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public async Task<global::VRCZ.VRChatApi.Generated.Groups.Item.Posts.PostsResponse?> GetAsync(Action<RequestConfiguration<global::VRCZ.VRChatApi.Generated.Groups.Item.Posts.PostsRequestBuilder.PostsRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        {
+#nullable restore
+#else
+        public async Task<global::VRCZ.VRChatApi.Generated.Groups.Item.Posts.PostsResponse> GetAsync(Action<RequestConfiguration<global::VRCZ.VRChatApi.Generated.Groups.Item.Posts.PostsRequestBuilder.PostsRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        {
+#endif
+            var requestInfo = ToGetRequestInformation(requestConfiguration);
+            var errorMapping = new Dictionary<string, ParsableFactory<IParsable>>
+            {
+                { "401", global::VRCZ.VRChatApi.Generated.Models.Error.CreateFromDiscriminatorValue },
+            };
+            return await RequestAdapter.SendAsync<global::VRCZ.VRChatApi.Generated.Groups.Item.Posts.PostsResponse>(requestInfo, global::VRCZ.VRChatApi.Generated.Groups.Item.Posts.PostsResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Create a post in a Group.

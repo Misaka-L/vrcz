@@ -8,6 +8,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
+using VRCZ.VRChatApi.Generated.Avatars.Item.Impostor;
 using VRCZ.VRChatApi.Generated.Avatars.Item.Select;
 using VRCZ.VRChatApi.Generated.Avatars.Item.SelectFallback;
 using VRCZ.VRChatApi.Generated.Models;
@@ -19,6 +20,11 @@ namespace VRCZ.VRChatApi.Generated.Avatars.Item
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class WithAvatarItemRequestBuilder : BaseRequestBuilder
     {
+        /// <summary>The impostor property</summary>
+        public global::VRCZ.VRChatApi.Generated.Avatars.Item.Impostor.ImpostorRequestBuilder Impostor
+        {
+            get => new global::VRCZ.VRChatApi.Generated.Avatars.Item.Impostor.ImpostorRequestBuilder(PathParameters, RequestAdapter);
+        }
         /// <summary>The select property</summary>
         public global::VRCZ.VRChatApi.Generated.Avatars.Item.Select.SelectRequestBuilder Select
         {

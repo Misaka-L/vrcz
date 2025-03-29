@@ -32,6 +32,7 @@ using VRCZ.VRChatApi.Generated.Listing;
 using VRCZ.VRChatApi.Generated.Logout;
 using VRCZ.VRChatApi.Generated.Message;
 using VRCZ.VRChatApi.Generated.Permissions;
+using VRCZ.VRChatApi.Generated.Prints;
 using VRCZ.VRChatApi.Generated.RequestInvite;
 using VRCZ.VRChatApi.Generated.Steam;
 using VRCZ.VRChatApi.Generated.Subscriptions;
@@ -160,6 +161,11 @@ namespace VRCZ.VRChatApi.Generated
         public global::VRCZ.VRChatApi.Generated.Permissions.PermissionsRequestBuilder Permissions
         {
             get => new global::VRCZ.VRChatApi.Generated.Permissions.PermissionsRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The prints property</summary>
+        public global::VRCZ.VRChatApi.Generated.Prints.PrintsRequestBuilder Prints
+        {
+            get => new global::VRCZ.VRChatApi.Generated.Prints.PrintsRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The requestInvite property</summary>
         public global::VRCZ.VRChatApi.Generated.RequestInvite.RequestInviteRequestBuilder RequestInvite

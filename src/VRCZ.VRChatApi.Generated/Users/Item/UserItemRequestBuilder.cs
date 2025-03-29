@@ -9,12 +9,16 @@ using System.Threading.Tasks;
 using System.Threading;
 using System;
 using VRCZ.VRChatApi.Generated.Models;
+using VRCZ.VRChatApi.Generated.Users.Item.AddTags;
 using VRCZ.VRChatApi.Generated.Users.Item.Avatar;
+using VRCZ.VRChatApi.Generated.Users.Item.Badges;
 using VRCZ.VRChatApi.Generated.Users.Item.Delete;
 using VRCZ.VRChatApi.Generated.Users.Item.Feedback;
 using VRCZ.VRChatApi.Generated.Users.Item.Groups;
 using VRCZ.VRChatApi.Generated.Users.Item.Instances;
+using VRCZ.VRChatApi.Generated.Users.Item.Item;
 using VRCZ.VRChatApi.Generated.Users.Item.Name;
+using VRCZ.VRChatApi.Generated.Users.Item.RemoveTags;
 namespace VRCZ.VRChatApi.Generated.Users.Item
 {
     /// <summary>
@@ -23,10 +27,20 @@ namespace VRCZ.VRChatApi.Generated.Users.Item
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class UserItemRequestBuilder : BaseRequestBuilder
     {
+        /// <summary>The addTags property</summary>
+        public global::VRCZ.VRChatApi.Generated.Users.Item.AddTags.AddTagsRequestBuilder AddTags
+        {
+            get => new global::VRCZ.VRChatApi.Generated.Users.Item.AddTags.AddTagsRequestBuilder(PathParameters, RequestAdapter);
+        }
         /// <summary>The avatar property</summary>
         public global::VRCZ.VRChatApi.Generated.Users.Item.Avatar.AvatarRequestBuilder Avatar
         {
             get => new global::VRCZ.VRChatApi.Generated.Users.Item.Avatar.AvatarRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The badges property</summary>
+        public global::VRCZ.VRChatApi.Generated.Users.Item.Badges.BadgesRequestBuilder Badges
+        {
+            get => new global::VRCZ.VRChatApi.Generated.Users.Item.Badges.BadgesRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The deletePath property</summary>
         public global::VRCZ.VRChatApi.Generated.Users.Item.Delete.DeleteRequestBuilder DeletePath
@@ -52,6 +66,23 @@ namespace VRCZ.VRChatApi.Generated.Users.Item
         public global::VRCZ.VRChatApi.Generated.Users.Item.Name.NameRequestBuilder Name
         {
             get => new global::VRCZ.VRChatApi.Generated.Users.Item.Name.NameRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The removeTags property</summary>
+        public global::VRCZ.VRChatApi.Generated.Users.Item.RemoveTags.RemoveTagsRequestBuilder RemoveTags
+        {
+            get => new global::VRCZ.VRChatApi.Generated.Users.Item.RemoveTags.RemoveTagsRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>Gets an item from the VRCZ.VRChatApi.Generated.users.item.item collection</summary>
+        /// <param name="position">Must be a valid world ID.</param>
+        /// <returns>A <see cref="global::VRCZ.VRChatApi.Generated.Users.Item.Item.WithWorldItemRequestBuilder"/></returns>
+        public global::VRCZ.VRChatApi.Generated.Users.Item.Item.WithWorldItemRequestBuilder this[string position]
+        {
+            get
+            {
+                var urlTplParams = new Dictionary<string, object>(PathParameters);
+                urlTplParams.Add("worldId", position);
+                return new global::VRCZ.VRChatApi.Generated.Users.Item.Item.WithWorldItemRequestBuilder(urlTplParams, RequestAdapter);
+            }
         }
         /// <summary>
         /// Instantiates a new <see cref="global::VRCZ.VRChatApi.Generated.Users.Item.UserItemRequestBuilder"/> and sets the default values.

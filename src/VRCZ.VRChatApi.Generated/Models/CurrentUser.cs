@@ -37,9 +37,9 @@ namespace VRCZ.VRChatApi.Generated.Models
 #endif
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData { get; set; }
-        /// <summary>obsolete, use `ageVerified` instead.`ageVerificationStatus == &quot;18+&quot;` =&gt; `ageVerified == true``ageVerificationStatus != &quot;18+&quot;` =&gt; `ageVerified == false`</summary>
+        /// <summary>`verified` is obsolete.User who have verified and are 18+ can switch to `plus18` status.</summary>
         public global::VRCZ.VRChatApi.Generated.Models.AgeVerificationStatus? AgeVerificationStatus { get; set; }
-        /// <summary>`true` if, user is age verified 18 or above. but `false`, when status is not shared. Otherwise always `false`.</summary>
+        /// <summary>`true` if, user is age verified (not 18+).</summary>
         public bool? AgeVerified { get; set; }
         /// <summary>The allowAvatarCopying property</summary>
         public bool? AllowAvatarCopying { get; set; }
@@ -272,6 +272,14 @@ namespace VRCZ.VRChatApi.Generated.Models
 #else
         public string PicoId { get; set; }
 #endif
+        /// <summary>The platform_history property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<global::VRCZ.VRChatApi.Generated.Models.CurrentUser_platform_history>? PlatformHistory { get; set; }
+#nullable restore
+#else
+        public List<global::VRCZ.VRChatApi.Generated.Models.CurrentUser_platform_history> PlatformHistory { get; set; }
+#endif
         /// <summary>The presence property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -484,6 +492,7 @@ namespace VRCZ.VRChatApi.Generated.Models
                 { "onlineFriends", n => { OnlineFriends = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "pastDisplayNames", n => { PastDisplayNames = n.GetCollectionOfObjectValues<global::VRCZ.VRChatApi.Generated.Models.PastDisplayName>(global::VRCZ.VRChatApi.Generated.Models.PastDisplayName.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "picoId", n => { PicoId = n.GetStringValue(); } },
+                { "platform_history", n => { PlatformHistory = n.GetCollectionOfObjectValues<global::VRCZ.VRChatApi.Generated.Models.CurrentUser_platform_history>(global::VRCZ.VRChatApi.Generated.Models.CurrentUser_platform_history.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "presence", n => { Presence = n.GetObjectValue<global::VRCZ.VRChatApi.Generated.Models.CurrentUserPresence>(global::VRCZ.VRChatApi.Generated.Models.CurrentUserPresence.CreateFromDiscriminatorValue); } },
                 { "profilePicOverride", n => { ProfilePicOverride = n.GetStringValue(); } },
                 { "profilePicOverrideThumbnail", n => { ProfilePicOverrideThumbnail = n.GetStringValue(); } },
@@ -563,6 +572,7 @@ namespace VRCZ.VRChatApi.Generated.Models
             writer.WriteCollectionOfPrimitiveValues<string>("onlineFriends", OnlineFriends);
             writer.WriteCollectionOfObjectValues<global::VRCZ.VRChatApi.Generated.Models.PastDisplayName>("pastDisplayNames", PastDisplayNames);
             writer.WriteStringValue("picoId", PicoId);
+            writer.WriteCollectionOfObjectValues<global::VRCZ.VRChatApi.Generated.Models.CurrentUser_platform_history>("platform_history", PlatformHistory);
             writer.WriteObjectValue<global::VRCZ.VRChatApi.Generated.Models.CurrentUserPresence>("presence", Presence);
             writer.WriteStringValue("profilePicOverride", ProfilePicOverride);
             writer.WriteStringValue("profilePicOverrideThumbnail", ProfilePicOverrideThumbnail);

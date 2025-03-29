@@ -9,7 +9,9 @@ using System.Threading.Tasks;
 using System.Threading;
 using System;
 using VRCZ.VRChatApi.Generated.Avatars.Favorites;
+using VRCZ.VRChatApi.Generated.Avatars.Impostor;
 using VRCZ.VRChatApi.Generated.Avatars.Item;
+using VRCZ.VRChatApi.Generated.Avatars.Licensed;
 using VRCZ.VRChatApi.Generated.Models;
 namespace VRCZ.VRChatApi.Generated.Avatars
 {
@@ -23,6 +25,16 @@ namespace VRCZ.VRChatApi.Generated.Avatars
         public global::VRCZ.VRChatApi.Generated.Avatars.Favorites.FavoritesRequestBuilder Favorites
         {
             get => new global::VRCZ.VRChatApi.Generated.Avatars.Favorites.FavoritesRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The impostor property</summary>
+        public global::VRCZ.VRChatApi.Generated.Avatars.Impostor.ImpostorRequestBuilder Impostor
+        {
+            get => new global::VRCZ.VRChatApi.Generated.Avatars.Impostor.ImpostorRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The licensed property</summary>
+        public global::VRCZ.VRChatApi.Generated.Avatars.Licensed.LicensedRequestBuilder Licensed
+        {
+            get => new global::VRCZ.VRChatApi.Generated.Avatars.Licensed.LicensedRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>Gets an item from the VRCZ.VRChatApi.Generated.avatars.item collection</summary>
         /// <param name="position">Must be a valid avatar ID.</param>

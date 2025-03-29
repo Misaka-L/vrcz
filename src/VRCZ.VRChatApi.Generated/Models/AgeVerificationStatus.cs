@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 using System;
 namespace VRCZ.VRChatApi.Generated.Models
 {
-    /// <summary>obsolete, use `ageVerified` instead.`ageVerificationStatus == &quot;18+&quot;` =&gt; `ageVerified == true``ageVerificationStatus != &quot;18+&quot;` =&gt; `ageVerified == false`</summary>
+    /// <summary>`verified` is obsolete.User who have verified and are 18+ can switch to `plus18` status.</summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public enum AgeVerificationStatus
     {

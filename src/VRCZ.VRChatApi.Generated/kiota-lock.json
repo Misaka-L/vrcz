@@ -1,6 +1,6 @@
 {
-  "descriptionHash": "E194D36CB296FB02552879F41905B6EBDC46B33A70A53F4B84E53D1CD6D5031AD3B63128EC87711E700641FCACFB06FE7C3691DD93CC9F51A9FABD4AD5A6A5A9",
-  "descriptionLocation": "https://misaka-l.github.io/vrchat-api-specification/openapi.yaml",
+  "descriptionHash": "B713DA70DD49DF790A204297835E98E1CA60630BA34327918A2C00AC634816CA2B8626B97326D9B8AE28F95AF78AED1D7EE83A782C212A8856B38C23584FA4F9",
+  "descriptionLocation": "https://project-vrcz.github.io/vrchat-api-specification/openapi.yaml",
   "lockFileVersion": "1.0.0",
   "kiotaVersion": "1.23.0",
   "clientClassName": "VRChatApiClient",
