@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using VRCZ.VRChatApi.Generated.Models;
 
 namespace VRCZ.Core.Models.VRChat.WebSocket;
 
@@ -9,7 +10,6 @@ public class VRChatWebSocketWorld
     [JsonPropertyName("description")] public string? Description { get; set; }
     [JsonPropertyName("authorId")] public string? AuthorId { get; set; }
     [JsonPropertyName("authorName")] public string? AuthorName { get; set; }
-    [JsonPropertyName("releaseStatus")] public string? ReleaseStatus { get; set; }
     [JsonPropertyName("featured")] public bool? Featured { get; set; }
     [JsonPropertyName("capacity")] public long? Capacity { get; set; }
     [JsonPropertyName("recommendedCapacity")]

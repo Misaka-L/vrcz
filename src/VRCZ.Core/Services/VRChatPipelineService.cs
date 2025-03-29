@@ -270,9 +270,9 @@ public class VRChatPipelineService(
                     break;
                 }
 
-                if (payload is IVRChatWebSocketWorldPayload worldPayload)
+                if (payload is IVRChatWebSocketWorldPayload { World: { } world })
                 {
-                    // TODO
+                    trackedEntitiesService.AddOrUpdateWorld(world);
                 }
 
                 if (payload is IVRChatCurrentUserPayload or IVRChatWebSocketFriendUserPayload)
@@ -336,14 +336,14 @@ public class VRChatPipelineService(
 
                         if (!string.IsNullOrWhiteSpace(locationPayload.Location) && !locationPayload.Location.Contains("traveling"))
                         {
-                            trackedEntitiesService.AddOrUpdateUserLocation(userId,
+                            await trackedEntitiesService.AddOrUpdateUserLocationWithWorldInstanceAsync(userId,
                                 UserLocation.Parse(locationPayload.Location));
                             break;
                         }
 
                         if (!string.IsNullOrWhiteSpace(locationPayload.TravelingToLocation))
                         {
-                            trackedEntitiesService.AddOrUpdateUserLocation(userId,
+                            await trackedEntitiesService.AddOrUpdateUserLocationWithWorldInstanceAsync(userId,
                                 UserLocation.Parse(locationPayload.TravelingToLocation) with
                                 {
                                     LocationType = UserLocationType.Traveling

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options;
 using VRCZ.Core.Exceptions;
 using VRCZ.Core.Mappers;
 using VRCZ.Core.Models;
@@ -15,6 +16,9 @@ public class VRChatTrackedEntitiesService(VRChatApiClient vrchatApiClient)
 
     private readonly ConcurrentDictionary<string, TrackedVRChatUser> _friends = new();
     private readonly ConcurrentDictionary<string, UserLocation> _userLocations = new();
+
+    private readonly ConcurrentDictionary<string, World> _worlds = [];
+    private readonly ConcurrentDictionary<InstanceIdentity, TrackedVRChatInstance> _instances = [];
 
     public event EventHandler<CurrentUser?>? LoggedInUserUpdated;
 
@@ -38,8 +42,13 @@ public class VRChatTrackedEntitiesService(VRChatApiClient vrchatApiClient)
         LoggedInUserUpdated?.Invoke(this, user);
     }
 
+    #region Friends
+
     internal void AddOrUpdateFriend(TrackedVRChatUser user)
     {
+        if (!user.IsFriend ?? false)
+            throw new ArgumentException("User is not a friend", nameof(user));
+
         var userExist = _friends.ContainsKey(user.Id);
 
         _friends.AddOrUpdate(user.Id, user, (_, _) => user);
@@ -120,7 +129,13 @@ public class VRChatTrackedEntitiesService(VRChatApiClient vrchatApiClient)
 
         var user = TrackedVRChatEntitiesMapper.ToLimitedUser(removedFriend);
         FriendRemoved?.Invoke(this, user);
+
+        RunUserLocationGc();
     }
+
+    #endregion
+
+    #region User Location
 
     internal void AddOrUpdateUserLocation(string userId, UserLocation userLocation)
     {
@@ -134,9 +149,126 @@ public class VRChatTrackedEntitiesService(VRChatApiClient vrchatApiClient)
 
         _userLocations.AddOrUpdate(userId, userLocation, (_, _) => userLocation);
         UserLocationUpdated?.Invoke(this, new UserLocationUpdatedEventArgs(userId, userLocation));
+
+        RunWorldsInstancesGc();
+    }
+
+    internal async Task AddOrUpdateUserLocationWithWorldInstanceAsync(string userId, UserLocation userLocation)
+    {
+        if (userLocation.WorldId is { } worldId)
+        {
+            await GetCachedWorldAsync(worldId);
+
+            if (userLocation.InstanceId is { } instanceId)
+            {
+                await GetCachedInstanceAsync(worldId, instanceId);
+            }
+        }
+
+        AddOrUpdateUserLocation(userId, userLocation);
     }
 
     #endregion
+
+    #region Worlds
+
+    internal void AddOrUpdateWorld(VRChatWebSocketWorld world)
+    {
+        var result = _worlds.TryGetValue(world.Id, out var cachedWorld)
+            ? TrackedVRChatEntitiesMapper.ApplyUpdateToWorld(cachedWorld, world)
+            : TrackedVRChatEntitiesMapper.ToWorld(world);
+
+        AddOrUpdateWorld(result);
+    }
+
+    internal void AddOrUpdateWorld(World world)
+    {
+        if (world.Id is not { } id)
+            throw new ArgumentException("World ID is null", nameof(world));
+
+        _worlds.AddOrUpdate(id, world, (_, _) => world);
+    }
+
+    #endregion
+
+    #region Instances
+
+    internal void AddOrUpdateInstance(Instance instance)
+    {
+        if (instance.InstanceId is not { } id)
+            throw new ArgumentException("Instance ID is null", nameof(instance));
+
+        if (instance.World is not { } world)
+            throw new ArgumentException("Instance world is null", nameof(instance));
+
+        if (world.Id is not { } worldId)
+            throw new ArgumentException("Instance world ID is null", nameof(instance));
+
+        AddOrUpdateWorld(world);
+
+        if (instance.Users is { } users)
+        {
+            foreach (var limitedUser in users.Where(user => user.Id is not null && (user.IsFriend ?? false)).ToArray())
+            {
+                AddOrUpdateFriend(limitedUser);
+            }
+        }
+
+        var result = TrackedVRChatEntitiesMapper.ToTrackedInstance(instance);
+
+        _instances.AddOrUpdate(new InstanceIdentity(worldId, id), result, (_, _) => result);
+    }
+
+    #endregion
+
+    #endregion
+
+    #region Cache GC
+
+    internal void RunWorldsInstancesGc()
+    {
+        var instancesToRemove = _instances
+            .Where(instance =>
+                _userLocations.All(location => location.Value.InstanceId != instance.Value.Id))
+            .ToArray();
+
+        var worldsToRemove = _worlds
+            .Where(world =>
+                _userLocations.All(location => location.Value.WorldId != world.Value.Id) &&
+                _instances.All(instance => instance.Value.WorldId != world.Value.Id))
+            .ToArray();
+
+        foreach (var instance in instancesToRemove)
+        {
+            _instances.TryRemove(instance);
+        }
+
+        foreach (var world in worldsToRemove)
+        {
+            _worlds.TryRemove(world);
+        }
+    }
+
+    internal void RunUserLocationGc()
+    {
+        var userLocationsToRemove = _userLocations
+            .Where(
+                location =>
+                    _friends.All(user => user.Key != location.Key) &&
+                    _loggedInUser?.Id != location.Key)
+            .ToArray();
+
+        foreach (var location in userLocationsToRemove)
+        {
+            _userLocations.TryRemove(location);
+        }
+
+        RunWorldsInstancesGc();
+    }
+
+    #endregion
+
+    #region Get Methods
 
     public async ValueTask<User> GetUserAsync(string userId)
     {
@@ -150,13 +282,96 @@ public class VRChatTrackedEntitiesService(VRChatApiClient vrchatApiClient)
             _loggedInUser = VRChatUserMapper.UserToCurrentUser(user);
         }
 
-        if (_loggedInUser?.Friends?.Contains(userId) ?? false)
+        if ((_loggedInUser?.Friends?.Contains(userId) ?? false) || _friends.ContainsKey(userId))
         {
             AddOrUpdateFriend(user);
         }
 
         return user;
     }
+
+    public UserLocation? GetUserLocation(string userId)
+    {
+        return _userLocations.GetValueOrDefault(userId);
+    }
+
+    #region Worlds
+
+    public async ValueTask<World> GetAndCacheWorldAsync(string worldId)
+    {
+        var world = await vrchatApiClient.Worlds[worldId].GetAsync();
+
+        if (world is null)
+            throw new UnexpectedApiBehaviourException("World response body is null");
+
+        AddOrUpdateWorld(world);
+
+        return world;
+    }
+
+    public async ValueTask<World> GetCachedWorldAsync(string worldId)
+    {
+        if (_worlds.TryGetValue(worldId, out var world))
+            return world;
+
+        return await GetAndCacheWorldAsync(worldId);
+    }
+
+    public async ValueTask<World> GetWorldAsync(string worldId)
+    {
+        var world = await vrchatApiClient.Worlds[worldId].GetAsync();
+
+        if (world is null)
+            throw new UnexpectedApiBehaviourException("World response body is null");
+
+        if (_worlds.ContainsKey(worldId))
+            AddOrUpdateWorld(world);
+
+        return world;
+    }
+
+    #endregion
+
+    #region Instanaces
+
+    public async ValueTask<Instance> GetAndCacheInstanceAsync(string worldId, string instanceId)
+    {
+        var instance = await vrchatApiClient.Instances.WithWorldIdWithInstanceId(instanceId, worldId)
+            .GetAsync(config =>
+            {
+                var handler = new UriReplacementHandlerOption(true, [
+                    new KeyValuePair<string, string>("%28", "("),
+                    new KeyValuePair<string, string>("%29", ")")
+                ]);
+
+                config.Options.Add(handler);
+            });
+
+        if (instance is null)
+            throw new UnexpectedApiBehaviourException("Instance response body is null");
+
+        AddOrUpdateInstance(instance);
+
+        return instance;
+    }
+
+    public async ValueTask<Instance> GetCachedInstanceAsync(string worldId, string instanceId)
+    {
+        if (!_instances.TryGetValue(new InstanceIdentity(worldId, instanceId), out var instance))
+            return await GetAndCacheInstanceAsync(worldId, instanceId);
+
+        var result = TrackedVRChatEntitiesMapper.ToInstance(instance);
+        var world = await GetCachedWorldAsync(worldId);
+
+        result.World = world;
+        result.Id = worldId;
+
+        return result;
+    }
+
+    #endregion
+
+    #region Freinds
 
     public LimitedUser[] GetFriends()
     {
@@ -172,6 +387,21 @@ public class VRChatTrackedEntitiesService(VRChatApiClient vrchatApiClient)
 
         foreach (var friend in friends)
         {
+            if (friend.Location is null)
+                throw new UnexpectedApiBehaviourException("Friend location is null");
+
+            var location = UserLocation.Parse(friend.Location);
+
+            if (location.WorldId is { } worldId)
+            {
+                await GetCachedWorldAsync(worldId);
+
+                if (location.InstanceId is { } instanceId)
+                {
+                    await GetCachedInstanceAsync(worldId, instanceId);
+                }
+            }
+
             AddOrUpdateFriend(friend);
         }
 
@@ -203,6 +433,10 @@ public class VRChatTrackedEntitiesService(VRChatApiClient vrchatApiClient)
 
         return friends.ToArray();
     }
+
+    #endregion
+
+    #endregion
 }
 
 public class UserLocationUpdatedEventArgs(string userId, UserLocation userLocation) : EventArgs
@@ -210,3 +444,5 @@ public class UserLocationUpdatedEventArgs(string userId, UserLocation userLocati
     public string UserId { get; } = userId;
     public UserLocation UserLocation { get; } = userLocation;
 }
+
+public record InstanceIdentity(string WorldId, string InstanceId);

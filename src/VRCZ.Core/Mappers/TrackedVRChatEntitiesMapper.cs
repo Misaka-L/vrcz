@@ -23,4 +23,12 @@ public static partial class TrackedVRChatEntitiesMapper
     public static partial TrackedVRChatUser ApplyUpdateToTrackedUser(TrackedVRChatUser trackedUser, LimitedUser userUpdate);
 
     public static partial TrackedVRChatUser ApplyUpdateToTrackedUser(TrackedVRChatUser trackedUser, VRChatWebSocketFriendUser userUpdate);
+
+    public static partial World ToWorld(VRChatWebSocketWorld world);
+
+    public static partial World ApplyUpdateToWorld(World world, VRChatWebSocketWorld worldUpdate);
+
+    public static partial TrackedVRChatInstance ToTrackedInstance(Instance instance);
+
+    public static partial Instance ToInstance(TrackedVRChatInstance trackedInstance);
 }

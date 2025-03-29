@@ -16,7 +16,7 @@ public class FriendsPanelViewModel : ViewModelBase
     {
         _weakReferenceMessenger = weakReferenceMessenger;
         var friends = trackedEntitiesService.GetFriends()
-            .Select(user => new FriendItemViewModel(weakReferenceMessenger, user))
+            .Select(user => new FriendItemViewModel(weakReferenceMessenger, user, trackedEntitiesService))
             .ToArray();
 
         Friends = new ObservableCollection<FriendItemViewModel>(friends);
@@ -27,7 +27,7 @@ public class FriendsPanelViewModel : ViewModelBase
                 if (r.Friends.Any(f => f.User.Id == message.Value.Id))
                     return;
 
-                r.Friends.Add(new FriendItemViewModel(r._weakReferenceMessenger, message.Value));
+                r.Friends.Add(new FriendItemViewModel(r._weakReferenceMessenger, message.Value, trackedEntitiesService));
             });
 
         weakReferenceMessenger.Register<FriendsPanelViewModel, FriendRemovedMessage>(this, (r, message) =>
